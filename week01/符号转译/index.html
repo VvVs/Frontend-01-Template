@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- html 符号转译 -->
+    <div attr="这是一个双引号 &quot;又是一个双引号&quot;"></div>
+
+    <div>
+        &#129300;
+    </div>
+
+    <div>
+        &#165;
+    </div>
+
+    <div>
+        &#38; 
+        &#60;
+    </div>
+</body>
+<script>
+    /**
+     * js 符号转译
+     **/
+    var str = '';
+    
+    // 单引号转译
+    str = '\' 这就是单引号了 \'';
+    console.log(str); // ' 这就是单引号了 '
+
+    // 双引号转译
+    str = "\" 这里是双引号了 \"";
+    console.log(str); // " 这里是双引号了 "
+
+    // \转译
+    str = "\\这是一段话\\";
+    console.log(str); // \这是一段话\
+</script>
+</html>
