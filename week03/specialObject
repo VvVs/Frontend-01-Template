@@ -1,0 +1,15 @@
+Object
+    [[Get]] property被访问时调用 get
+    [[Set]] property被赋值时调用 set
+    [[GetPrototypeOf]]
+    [[SetPrototypeOf]]
+    [[GetOwnProperty]]
+    [[HasProperty]]
+    [[IsExtensible]]
+    [[PreventExtensions]]
+    [[DefineOwnProperty]]
+    [[Delete]]
+    [[OwnPropertyKeys]] 
+        Object.keys() Object.entries() Object.values()
+    [[Call]] 
+
