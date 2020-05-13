@@ -15,7 +15,7 @@
         - HTTP协议
             - HTTP1.1
                 - [HTTP1.1](https://tools.ietf.org/html/rfc2616)
-                - [HTTP1.1](https://tools.ietf.org/html/rfc7234)
+                - [HTTP1.1补充](https://tools.ietf.org/html/rfc7234)
         - HTTP格式
             - Request
                 - 第一行被称为 request line[^1]
@@ -74,7 +74,7 @@
                 -                   |        -
                 Accept              | 浏览器接收的格式
                 Accept-Encoding     | 浏览器接收的编码方式
-                Accept-Lanuage      | 浏览器接收的语言，用于服务端多语言判断
+                Accept-Language      | 浏览器接收的语言，用于服务端多语言判断
                 Cache-Control       | 控制缓存的时效性
                 Connection          | 连接方式，如果是Keep-Alive 且服务端支持，则会复用链接
                 Host                | HTTP访问使用的域名
@@ -105,7 +105,7 @@
             - 常见body格式
                 - application/json
                 - application/x-www-form-urlencoded (表单格式上传)
-                - mutipart/form-data (上传文件时)
+                - multipart/form-data (上传文件时)
                 - text/xml
 
         - HTTPS
