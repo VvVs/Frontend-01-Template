@@ -38,7 +38,7 @@
     - 动态类型系统/静态类型系统
     - 强类型弱类型 (强类型无隐式转换，弱类型有隐式转换)
         - String + Number
-        - String == Boollean
+        - String == Boolean
     - 符合结构
         - 结构体 （对象）
         - 函数签名 
