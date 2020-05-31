@@ -1,12 +1,10 @@
 const net = require('net');
-const parser = require('./HTML-PARSE/attribute.js');
+const images = require('images');
+
+const parser = require('./parse.js');
+const render = require('./render.js');
 
 class Request {
-    /**
-     * method , url = host + port + path 
-     * body: k/v
-     * headers
-     */
     constructor(options) {
         this.method = options.method || 'GET';
         this.host = options.host;
@@ -14,57 +12,50 @@ class Request {
         this.path = options.path || '/';
         this.body = options.body || {};
         this.headers = options.headers || {};
-
-        if (!this.headers["Content-Type"]) {
-            this.headers["Content-Type"] = "application/x-www-form-urlencoded"
+        if (this.headers['Content-Type']) {
+            this.headers['Content-Type'] = 'application/x-www-form-urlencoded';
         }
 
-        if (this.headers["Content-Type"] === "text/json") {
+        if (this.headers['Content-Type'] === 'application/json') {
             this.bodyText = JSON.stringify(this.body);
-        } else if (this.headers["Content-Type"] === "application/x-www-form-urlencoded") {
-            this.bodyText = Object.keys(this.body).map(key => `${key}=${encodeURIComponent(this.body[key])}`).join('&')
+        } else if (this.headers['Content-Type'].includes('application/x-www-form-urlencoded')) {
+            this.bodyText = Object.keys(this.body).map(key => `${key}=${encodeURIComponent(this.body[key])}`).join('&');
         }
-
-        this.headers["Content-length"] = this.bodyText.length;
-    }
+        this.headers['Content-Length'] = this.bodyText.length;
+    };
 
     toString() {
-        return`${this.method} ${this.path} HTTP/1.1\r
-${Object.keys(this.headers).map(key => `${key}: ${this.headers[key]}`).join('\r\n')}\r
+        return `${this.method} ${this.path} HTTP/1.1\r
+${Object.keys(this.headers).map(key => `${key}: ${this.headers[key]}`).join('\r\n')}
 \r
-${this.bodyText}`
-    }
+${this.bodyText}`;
+    };
 
     send(connection) {
         return new Promise((resolve, reject) => {
-            const parser = new ResponseParse();
+            const parser = new ResponseParser();
             if (connection) {
-                connection.write(this.toString())
+                connection.write(this.toString());
             } else {
                 connection = net.createConnection({
                     host: this.host,
-                    port: this.port
+                    port: this.port,
                 }, () => {
-                    connection.write(this.toString())
+                    connection.write(this.toString());
                 })
             }
-
             connection.on('data', (data) => {
                 parser.receive(data.toString());
                 if (parser.isFinished) {
                     resolve(parser.response);
                 }
-              //  resolve(data.toString());
-                console.log(parser.statusLine);
-                console.log(parser.headers);
                 connection.end();
             });
-
             connection.on('error', (err) => {
-                reject(data.toString());
+                reject(err);
                 connection.end();
             });
-        });
+        })
     }
 }
 
@@ -72,7 +63,7 @@ class Response {
 
 }
 
-class ResponseParse {
+class ResponseParser {
     constructor() {
         this.WAITING_STATUS_LINE = 0;
         this.WAITING_STATUS_LINE_END = 1;
@@ -84,11 +75,11 @@ class ResponseParse {
         this.WAITING_BODY = 7;
 
         this.current = this.WAITING_STATUS_LINE;
-        this.statusLine = "";
+        this.statusLine = '';
         this.headers = {};
-        this.headerName = "";
-        this.headerValue = "";
-        this.bodyParser = null;
+        this.headerName = '';
+        this.headerValue = '';
+        this.bodyParser = '';
     }
 
     get isFinished() {
@@ -114,40 +105,32 @@ class ResponseParse {
     receiveChar(char) {
         if (this.current === this.WAITING_STATUS_LINE) {
             if (char === '\r') {
-                this.current = this.WAITING_HEADER_LINE_END;
+                this.current = this.WAITING_STATUS_LINE_END;
             } else if (char === '\n') {
                 this.current = this.WAITING_HEADER_NAME;
             } else {
-                this.statusLine += char;
+                this.statusLine += (char);
             }
-        }
-
-        else if (this.current === this.WAITING_STATUS_LINE_END) {
+        } else if (this.current === this.WAITING_STATUS_LINE_END) {
             if (char === '\n') {
                 this.current = this.WAITING_HEADER_NAME;
             }
-        }
-
-        else if (this.current === this.WAITING_HEADER_NAME) {
+        } else if (this.current === this.WAITING_HEADER_NAME) {
             if (char === ':') {
                 this.current = this.WAITING_HEADER_SPACE;
             } else if (char === '\r') {
                 this.current = this.WAITING_HEADER_BLOCK_END;
-                if (this.headers['Transfer-Encoding'] === "chunked") {
-                    this.bodyParser = new TrunkedBodyParse();
+                if (this.headers['Transfer-Encoding'] === 'chunked') {
+                    this.bodyParser = new TruckedBodyParser();
                 }
             } else {
-                this.headerName += char;
+                this.headerName += (char);
             }
-        }
-
-        else if (this.current === this.WAITING_HEADER_SPACE) {
+        } else if (this.current === this.WAITING_HEADER_SPACE) {
             if (char === ' ') {
                 this.current = this.WAITING_HEADER_VALUE;
             }
-        }
-
-        else if (this.current === this.WAITING_HEADER_VALUE) {
+        } else if (this.current === this.WAITING_HEADER_VALUE) {
             if (char === '\r') {
                 this.current = this.WAITING_HEADER_LINE_END;
                 this.headers[this.headerName] = this.headerValue;
@@ -156,46 +139,37 @@ class ResponseParse {
             } else {
                 this.headerValue += char;
             }
-        }
-
-        else if (this.current === this.WAITING_HEADER_LINE_END) {
+        } else if (this.current === this.WAITING_HEADER_LINE_END) {
             if (char === '\n') {
                 this.current = this.WAITING_HEADER_NAME;
             }
-        }
-
-        else if (this.current === this.WAITING_HEADER_BLOCK_END) {
+        } else if (this.current === this.WAITING_HEADER_BLOCK_END) {
             if (char === '\n') {
                 this.current = this.WAITING_BODY;
             }
-        }
-
-        else if (this.current === this.WAITING_BODY) {
+        } else if (this.current === this.WAITING_BODY) {
             this.bodyParser.receiveChar(char);
         }
     }
 }
-
-class TrunkedBodyParse {
+class TruckedBodyParser {
     constructor() {
         this.WAITING_LENGTH = 0;
         this.WAITING_LENGTH_LINE_END = 1;
         this.READING_TRUNK = 2;
         this.WAITING_NEW_LINE = 3;
         this.WAITING_NEW_LINE_END = 4;
+
         this.length = 0;
         this.content = [];
-        this.isFinished = false; 
+        this.isFinished = false;
         this.current = this.WAITING_LENGTH;
     }
 
     receiveChar(char) {
-        // console.log(JSON.stringify(char))
-        // console.log(this.current);
         if (this.current === this.WAITING_LENGTH) {
             if (char === '\r') {
                 if (this.length === 0) {
-                    console.log(this.content);
                     this.isFinished = true;
                 }
                 this.current = this.WAITING_LENGTH_LINE_END;
@@ -203,23 +177,21 @@ class TrunkedBodyParse {
                 this.length *= 16;
                 this.length += parseInt(char, 16);
             }
-        }
-
-        else if (this.current === this.WAITING_LENGTH_LINE_END) {
+        } else if (this.current === this.WAITING_LENGTH_LINE_END) {
             if (char === '\n') {
                 this.current = this.READING_TRUNK;
             }
-        }
-
-        else if (this.current === this.READING_TRUNK) {
+        } else if (this.current === this.READING_TRUNK) {
             this.content.push(char);
             this.length--;
             if (this.length === 0) {
                 this.current = this.WAITING_NEW_LINE;
             }
-        }
-
-        else if (this.current === this.WAITING_NEW_LINE) {
+        } else if (this.current === this.WAITING_NEW_LINE) {
+            if (char === '\r') {
+                this.current = this.WAITING_NEW_LINE_END;
+            }
+        } else if (this.current === this.WAITING_NEW_LINE_END) {
             if (char === '\n') {
                 this.current = this.WAITING_LENGTH;
             }
@@ -227,60 +199,27 @@ class TrunkedBodyParse {
     }
 }
 
-void async function() {
+void async function () {
     let request = new Request({
-        method: "POST",
-        host: "127.0.0.1",
-        port: 8088,
+        method: 'GET',
+        host: '127.0.0.1',
+        port: '8088',
         path: '/',
         headers: {
-            ["X-Foo2"]: "customed"
+            ['Content-Type']: 'application/x-www-form-urlencoded',
+            ['X-Foo2']: 'customed'
         },
         body: {
-            name: "lihan"
+            name: 'lihan'
         }
-    });
-
+    })
     let response = await request.send();
-    console.log(response);
 
     let dom = parser.parseHTML(response.body);
+
+    let viewport = images(800, 600);
+
+    render(viewport, dom);
+    
+    viewport.save('viewport.jpg');
 }();
-
-
-// const client = net.createConnection(
-//     {
-//         host: '127.0.0.1',
-//         port: 8080
-//     }, () => {
-//         // 'connect' listener.
-//         console.log('connected to server!');
-
-//         let request = new Request({
-//             method: 'POST',
-//             host: '127.0.0.1',
-//             port: 8080,
-//             path: '/',
-//             headers: {
-//                 ["X-Foo2"]: "customed"
-//             },
-//             body: {
-//                 name: 'lihan'
-//             }
-//         });
-
-//         console.log(request.toString());
-//         client.write(request.toString());
-//     });
-
-
-// client.on('data', (data) => {
-//     console.log(data.toString());
-//     client.end();
-// });
-// client.on('end', () => {
-//     console.log('disconnected from server');
-// });
-// client.on('error', (err) => {
-//     console.log(err);
-// });
