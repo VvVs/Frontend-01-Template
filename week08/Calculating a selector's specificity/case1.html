@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /*
+        * case1 
+        *   Class selectors compare Attribute selectors
+        * result “=”
+        */
+        /* div#a.b .c[id=x] {
+            color: red;
+        }
+
+        div#a.b .c.d {
+            color: orange;
+        } */
+
+        /**
+        * case2 
+        *   attribute selectors compare Id selectors
+        * result “>”
+        */
+        /* div#a.b .c[id=x] {
+            color: blue;
+        }
+
+        div#a.b .c#x {
+            color: blueviolet;
+        } */
+
+        
+    </style>
+</head>
+<body>
+    <div id="a" class="b">
+        <div class="c d" id="x">123</div>
+    </div>
+</body>
+</html>
