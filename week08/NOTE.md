@@ -1,8 +1,12 @@
 # CSS
 - 简单选择器
-    - *
-    - .
+    - * 
+    - div svg|a
+    - .cls
     - #id
+    - [attr=value]
+    - :hover
+    - ::before
 - 复合选择器
     - <简单选择器><简单选择器><简单选择器>
     - * 或者 div必须写前面
@@ -22,12 +26,12 @@
     - *.a (0 0 1 0) 
     - div.a (0 0 1 1)
 - 伪类
-    - 链接
-        - :any-
-        - :visited
+    - 链接/行为
+        - :any-link
+        - :link :visited
         - :hover
-        - :link
         - :active
+        - :focus
         - :target
     - 树结构
         - :empty
@@ -143,5 +147,7 @@
         - BFC (block-formating-context)
             - 纵向排版的块级盒子
             - 只会发生在BFC中边距折叠 （margin折叠）
+            - 创建BFC
+                - 总结 能容纳正常流的就会创建BFC
 
 - float与clear
