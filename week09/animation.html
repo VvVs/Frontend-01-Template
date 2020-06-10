@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        @keyframes mykf {
+            from {
+                background: red;
+            }
+
+            to {
+                background: yellow;
+            }
+        }
+
+        @keyframes yourkf {
+            0% {
+                top: 0;
+                transition: top ease;
+            }
+
+            50% {
+                top: 30px;
+                transition: top ease-in;
+            }
+
+            75% {
+                top: 10px;
+                transition: top ease-out;
+            }
+
+            100% {
+                top: 0;
+                transition: top linear;
+            }
+        }
+
+        .div1 {
+            width: 100px;
+            height: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .div2 {
+            height: 100px;
+            width: 100px;
+            position: absolute;
+            top: 0;
+            left: 130px;
+            background: red;
+        }
+
+        .div1 {
+            animation: mykf 5s infinite;
+        }
+
+        .div2 {
+            animation: yourkf 5s infinite;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="div1"></div>
+    <div class="div2"></div>
+</body>
+
+</html>
