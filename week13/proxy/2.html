@@ -1,0 +1,52 @@
+let handles = new Map();
+    let usedReactivities = [];
+
+    let object = {
+        a: 1,
+        b: 2
+    }
+
+    function reactive(obj) {
+        return new Proxy(obj, {
+            get(obj, prop) {
+                usedReactivities.push([obj, prop]);
+                return obj[prop]
+            },
+            set(obj, prop, val) {
+                obj[prop] = val
+                if (handles.get(obj))
+                    if (handles.get(obj).get(prop))
+                        for (let handle of handles.get(obj).get(prop))
+                            handle() 
+
+                return obj[prop];
+            }
+        })
+    }
+
+    function effect(handle) {
+        usedReactivities = [];
+        handle();
+        console.log(usedReactivities);
+        for (let usedReactivity of usedReactivities) {
+            let [obj, prop] = usedReactivity;
+            if (!handles.has(obj)) {
+                handles.set(obj, new Map())
+            }
+
+            if (!handles.get(obj).has(prop)) {
+                handles.get(obj).set(prop, []);
+            }
+
+            handles.get(obj).get(prop).push(handle);
+        }
+    }
+
+    let dummy;
+
+    let proxy = reactive(object);
+
+    effect(() => dummy = proxy.a);
+    console.log(dummy);
+    proxy.a = 2;
+    console.log(dummy);
