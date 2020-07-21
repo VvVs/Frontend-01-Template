@@ -1,3 +1,4 @@
+// import {Carousel} from "./carousel.view";
 
 // function createElement(Cls, attributes, ...children){
 
@@ -41,6 +42,7 @@
 // }
 
 import { createElement, Text, Wrapper } from "./createElement";
+import { carousel } from "./carousel.view";
 
 
 ///////////////////////////////////////////////
