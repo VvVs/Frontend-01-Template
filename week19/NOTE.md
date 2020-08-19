@@ -49,7 +49,7 @@
     - server 服务端
     - publish-tool
     - publish-server
-- 使用技术
+- 技术点
     - nodeJs中的stream
     - [archiver](https://www.npmjs.com/package/archiver)
     - [unzipper](https://www.npmjs.com/package/unzipper)
